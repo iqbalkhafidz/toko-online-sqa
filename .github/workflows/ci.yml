@@ -2,41 +2,50 @@ name: SQA CI & CT Pipeline
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Ambil source code
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # 2. Setup PHP + Xdebug (untuk coverage)
       - name: Setup PHP Environment
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           coverage: xdebug
 
+      # 3. Install dependency PHP
       - name: Install PHP Dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Run PHPUnit & Quality Metrics
+      # 4. Jalankan PHPUnit (FIX: tanpa coverage-filter)
+      - name: Run PHPUnit & Code Coverage
         run: |
-          export XDEBUG_MODE=coverage
-          php vendor/bin/phpunit tests/ --coverage-text --coverage-filter src/
+          XDEBUG_MODE=coverage php vendor/bin/phpunit tests --coverage-text
 
+      # 5. Setup Node.js (untuk Cypress)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # 6. Install dependency Node.js
       - name: Install NPM Dependencies
         run: npm install
 
+      # 7. Jalankan server PHP lokal
       - name: Start PHP Server
         run: php -S localhost:8000 > /dev/null 2>&1 &
 
+      # 8. Jalankan Cypress E2E Test
       - name: Run Cypress E2E Tests
         uses: cypress-io/github-action@v6
         with:
