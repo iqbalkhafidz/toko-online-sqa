@@ -17,17 +17,17 @@ jobs:
         with:
           php-version: '8.2'
           coverage: xdebug
-          tools: composer:v2 # Memaksa penggunaan Composer versi terbaru yang sinkron dengan PHP 8.2
+          tools: composer:v2
 
       - name: Install PHP Dependencies
-        # Menambahkan flag --ignore-platform-req=php untuk melewati proteksi versi PHP saat install
         run: composer install --prefer-dist --no-progress --ignore-platform-req=php
 
       - name: Run PHPUnit & Quality Metrics
-        # Menambahkan --bootstrap vendor/autoload.php agar PHP mengenali semua komponen framework saat test berjalan
+        # Perubahan utama: Menggunakan filter pencarian class 'Test' secara eksplisit
+        # Dan membatasi scope scan agar file inisialisasi bermasalah tidak ikut dieksekusi sebagai test
         run: |
           export XDEBUG_MODE=coverage
-          php vendor/bin/phpunit --bootstrap vendor/autoload.php tests/ --coverage-text --coverage-filter src/ || php vendor/bin/phpunit tests/ --filter=Test --coverage-text --coverage-filter src/
+          php vendor/bin/phpunit --bootstrap vendor/autoload.php --filter=Test tests/ --coverage-text --coverage-filter src/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
