@@ -5,8 +5,9 @@ use App\Checkout;
 class CheckoutTest extends TestCase{
     private $seedFile = __DIR__ . '/../data/products_seed.json';
     private $testFile = __DIR__ . '/../data/products_test.json';
-    private $orderFile = ____ . '/../data/orders_test.json';
-    private $checkout
+    private $orderFile = __DI__ . '/../data/orders_test.json';
+    private $checkout;
+
     // CT Stage: Menyiapkan data segar SEBELUM tiap tes
     protected function setUp(): void{
         copy($this->seedFile, $this->testFile);
